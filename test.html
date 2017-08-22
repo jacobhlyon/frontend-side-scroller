@@ -22,6 +22,8 @@ var myEnemies = [];
 var enemyBullets = [];
 var myBullets = [];
 var myScore;
+var updatedScore = 0;
+var enemiesDestroyed = 0
 
 function startGame() {
     myGamePiece = new component(50, 50, "red", 50, 200);
@@ -174,7 +176,7 @@ function updateGameArea() {
         myBullets[i].x += 7;
         myBullets[i].update();
     }
-    myScore.text="SCORE: " + myGameArea.frameNo;
+    myScore.text="SCORE: " + updateScore()
     myScore.update();
     myGamePiece.newPos();
     myGamePiece.update();
@@ -182,9 +184,13 @@ function updateGameArea() {
 
 function destroyEnemy(i) {
     myEnemies.splice(i, 1)
+    enemiesDestroyed++
 }
 
-
+function updateScore() {
+    updatedScore = myGameArea.frameNo + (enemiesDestroyed * 1000)
+    return updatedScore
+}
 
 function everyinterval(n) {
     if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
