@@ -1,20 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<style>
-canvas {
-    border:1px solid #d3d3d3;
-    background-color: #f1f1f1;
-}
-/*stop arrow scrolling*/
-  body {
-    overflow: hidden;
-  }
-</style>
-</head>
-<body id="body" onload="startGame()">
-<script>
+
 
 var myGamePiece;
 var myObstacles = [];
@@ -29,16 +13,18 @@ function startGame() {
     myGamePiece = new component(50, 50, "red", 50, 200);
     myGamePiece.gravity = 100;
     myScore = new component("50px", "Consolas", "black", 280, 40, "text");
-    myGameArea.start();
+    myGameArea.play();
 }
 
 var myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
-        this.canvas.width = 1000;
-        this.canvas.height = 694;
+        this.canvas.width = 800;
+        this.canvas.height = 600;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        },
+    play : function () {   
         this.frameNo = 0;
         this.interval = setInterval(updateGameArea, 7); //speed, lower = faster, framerate, 1000 times/sec
         },
@@ -116,17 +102,17 @@ function updateGameArea() {
     var x, height, gap, minHeight, maxHeight, minGap, maxGap;
     for (i = 0; i < myObstacles.length; i += 1) {
         if (myGamePiece.crashWith(myObstacles[i], 'enemy')) {
-            return;
+            sendToMenu()
         }
     }
     for (i = 0; i < myEnemies.length; i += 1) {
         if (myGamePiece.crashWith(myEnemies[i], 'enemy')) {
-            return;
+            sendToMenu()
         }
     }
     for (i = 0; i < enemyBullets.length; i += 1) {
         if (myGamePiece.crashWith(enemyBullets[i], 'enemy')) {
-            return;
+            sendToMenu()
         }
     }
     for (i = 0; i < myBullets.length; i += 1) {
@@ -206,6 +192,22 @@ function shootGun() {
     myBullets.push(new component(20, 5, "black", x, y ));
 }
 
+function sendToMenu() {
+    clearInterval(myGameArea.interval)
+    reset()
+    loadMenu()
+}
+function reset() {
+    myObstacles = [];
+    myEnemies = [];
+    enemyBullets = [];
+    myBullets = [];
+    myScore = 0;
+    updatedScore = 0;
+    enemiesDestroyed = 0
+    myGameArea.frameNo = 0
+}
+
 
 document.getElementById('body').addEventListener('keydown', function(){
   if(event.key === "w" || event.key === "ArrowUp" ) { //up
@@ -230,12 +232,3 @@ document.getElementById('body').addEventListener('keyup', function(){
     shootGun();
   }
 })
-
-</script>
-<br>
-<button onmousedown="accelerate(-2)" onmouseup="accelerate(0)">UP</button>
-<button onmousedown="accelerate(2)" onmouseup="accelerate(0)">DOWN</button>
-<p>Use the ACCELERATE button to stay in the air</p>
-<p>How long can you stay alive?</p>
-</body>
-</html>
