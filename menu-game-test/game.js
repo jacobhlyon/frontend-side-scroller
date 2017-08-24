@@ -1,14 +1,13 @@
-
-
-var myGamePiece;
-var myObstacles = [];
-var myEnemies = [];
-var enemyBullets = [];
-var myBullets = [];
-var myScore;
-var updatedScore = 0;
-var enemiesDestroyed = 0
-var myBackground
+let myGamePiece;
+let myObstacles = [];
+let myEnemies = [];
+let enemyBullets = [];
+let myBullets = [];
+let myScore;
+let updatedScore = 0;
+let enemiesDestroyed = 0
+let gameOver = 0
+let myBackground
 
 function startGame() {
   setEventListeners()
@@ -19,17 +18,22 @@ function startGame() {
   myGameArea.play();
 }
 
-var myGameArea = {
+function createGameInterval(){
+  this.interval = setInterval(updateGameArea, 30); //speed, lower = faster, framerate, 1000 times/sec
+}
+
+let myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
         this.canvas.width = 800;
         this.canvas.height = 600;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        createGameInterval.call(this)
         },
     play : function () {
+        gameOver = 0
         this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 7); //speed, lower = faster, framerate, 1000 times/sec
         },
     clear : function() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -58,12 +62,12 @@ function component(width, height, color, x, y, type) {
             ctx.fillStyle = color;
             ctx.fillText(this.text, this.x, this.y);
         } else if (this.type == "image" || this.type == "background") {
-            ctx.drawImage(this.image, 
-            this.x, 
+            ctx.drawImage(this.image,
+            this.x,
             this.y,
             this.width, this.height)
             if (type == "background") {
-                ctx.drawImage(this.image, 
+                ctx.drawImage(this.image,
                 this.x + this.width, this.y, this.width, this.height);
             }
         } else {
@@ -84,7 +88,7 @@ function component(width, height, color, x, y, type) {
         this.hitTop()
     }
     this.hitBottom = function() {
-        var rockbottom = myGameArea.canvas.height - this.height;
+        let rockbottom = myGameArea.canvas.height - this.height;
         if (this.y > rockbottom) {
             this.y = rockbottom;
             this.gravitySpeed = 0;
@@ -99,15 +103,15 @@ function component(width, height, color, x, y, type) {
     }
 
     this.crashWith = function(otherobj, firingSide, index) {
-        var myleft = this.x;
-        var myright = this.x + (this.width);
-        var mytop = this.y;
-        var mybottom = this.y + (this.height);
-        var otherleft = otherobj.x;
-        var otherright = otherobj.x + (otherobj.width);
-        var othertop = otherobj.y;
-        var otherbottom = otherobj.y + (otherobj.height);
-        var crash = false;
+        let myleft = this.x;
+        let myright = this.x + (this.width);
+        let mytop = this.y;
+        let mybottom = this.y + (this.height);
+        let otherleft = otherobj.x;
+        let otherright = otherobj.x + (otherobj.width);
+        let othertop = otherobj.y;
+        let otherbottom = otherobj.y + (otherobj.height);
+        let crash = false;
         if ( !((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright))) {
             if (firingSide === 'enemy') {
               crash = true;
@@ -120,20 +124,24 @@ function component(width, height, color, x, y, type) {
 }
 
 function updateGameArea() {
-    var x, height, gap, minHeight, maxHeight, minGap, maxGap;
+  if(menu === "on") {
+    updateMenu()
+  } else {
+    let x, height, gap, minHeight, maxHeight, minGap, maxGap;
     for (i = 0; i < myObstacles.length; i += 1) {
         if (myGamePiece.crashWith(myObstacles[i], 'enemy')) {
-          return sendToMenu()
+          gameOver = 1
         }
     }
     for (i = 0; i < myEnemies.length; i += 1) {
         if (myGamePiece.crashWith(myEnemies[i], 'enemy')) {
-          return sendToMenu()
+          gameOver = 1
+
         }
     }
     for (i = 0; i < enemyBullets.length; i += 1) {
         if (myGamePiece.crashWith(enemyBullets[i], 'enemy')) {
-          return sendToMenu()
+          gameOver = 1
         }
     }
     for (i = 0; i < myBullets.length; i += 1) {
@@ -141,12 +149,17 @@ function updateGameArea() {
           myEnemies[j].crashWith(myBullets[i], 'friendly', j)
         }
     }
-    myGameArea.clear();
-    myBackground.update();
-    myBackground.newPos();
-    myBackground.speedX = -1
-    myGameArea.frameNo += 1;
-    if (myGameArea.frameNo == 1 || everyinterval(300)) {
+
+    if(gameOver === 0) {
+
+      myGameArea.clear();
+      myBackground.update();
+      myBackground.newPos();
+      myBackground.speedX = -1
+      myGameArea.frameNo += 1;
+
+      if (myGameArea.frameNo == 1 || everyinterval(300)) {
+
         x = myGameArea.canvas.width;
         minHeight = 20; //change to increase size of obstacles
         maxHeight = 200;
@@ -167,28 +180,32 @@ function updateGameArea() {
           myEnemies.push(new component(50, 50, "../Images/blue_ship.png", x, position, "image"));
       }
       for (i = 0; i < myEnemies.length; i += 1) {
-          myEnemies[i].x += -2;
-          myEnemies[i].update();
+        myEnemies[i].x += -2;
+        myEnemies[i].update();
       }
-    if (everyinterval(200)) {
-      for (i = 0; i < myEnemies.length; i += 1) {
+      if (everyinterval(200)) {
+        for (i = 0; i < myEnemies.length; i += 1) {
           x = myEnemies[i].x
           y = myEnemies[i].y + ( myEnemies[i].height / 2 )
           enemyBullets.push(new component(40, 40, "../Images/bullet_blue.png", x, y, "image" ));
         }
-    }
-    for (i = 0; i < enemyBullets.length; i += 1) {
+      }
+      for (i = 0; i < enemyBullets.length; i += 1) {
         enemyBullets[i].x += -5;
         enemyBullets[i].update();
-    }
-    for (i = 0; i < myBullets.length; i += 1) {
+      }
+      for (i = 0; i < myBullets.length; i += 1) {
         myBullets[i].x += 7;
         myBullets[i].update();
+      }
+      myScore.text="SCORE: " + updateScore()
+      myScore.update();
+      myGamePiece.newPos();
+      myGamePiece.update();
+    } else {
+      endGameScreen()
     }
-    myScore.text="SCORE: " + updateScore()
-    myScore.update();
-    myGamePiece.newPos();
-    myGamePiece.update();
+  }
 }
 
 function destroyEnemy(i) {
@@ -216,12 +233,14 @@ function shootGun() {
     myBullets.push(new component(50, 50, "../Images/bullet_red.png", x, y, "image" ));
 }
 
-function sendToMenu() {
+function endGameScreen() {
+  startFadeOut()
   removeEventListeners()
-  clearInterval(myGameArea.interval)
-  let finalScore = updatedScore
+  finalScore = updatedScore
   reset()
-  loadMenu(true, finalScore)
+  setEndGameListeners()
+  menu = "on"
+  menuAction = 2
 }
 
 function reset() {
@@ -232,7 +251,6 @@ function reset() {
     myScore = 0;
     updatedScore = 0;
     enemiesDestroyed = 0
-    myGameArea.frameNo = 0
 }
 
 function setKeydownListener(){

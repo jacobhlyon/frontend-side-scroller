@@ -1,49 +1,40 @@
+let menuAction;
+let scoreScreen = false
+let finalScore = 0
 
-document.addEventListener("DOMContentLoaded", function () {
+let menu = "on"
+scores = new ScoreList
 
-    loadMenu()
+var canvas = myGameArea.canvas;
+var context = canvas.getContext("2d");
+var width = canvas.width;
+var height = canvas.height;
 
- })
+var logoImage = new Image();
+var highScoreImage = new Image();
+var playImage = new Image();
+var bgImage = new Image();
 
- function loadMenu(endGame, endScore) {
+var buttonX = [192,192];
+var buttonY = [100,160];
+var buttonWidth = [96,260,182,160];
+var buttonHeight = [40,40,40,40];
 
-   let scoreScreen = endGame
-    myGameArea.start();
+var scoreX = [(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3)]
+var scoreY = [100,150,200,250,300,350,400,450,500,550]
 
-    scores = new ScoreList
+logoImage.src = "../Images/logo.png";
+playImage.src = "../Images/play_buttons.png";
+highScoreImage.src = "../Images/score_buttons.png";
+bgImage.src = "../Images/Background.png";
 
-    var canvas = myGameArea.canvas;
-    var context = canvas.getContext("2d");
-    var width = canvas.width;
-    var height = canvas.height;
+var initialX = [300, 400, 500]
+var initialY = [150, 150, 150]
 
-    var logoImage = new Image();
-    var highScoreImage = new Image();
-    var playImage = new Image();
-    var bgImage = new Image();
+var framesRate = 30;
+var timerId = 0;
 
-    logoImage.src = "../Images/logo.png";
-    playImage.src = "../Images/play_buttons.png";
-    highScoreImage.src = "../Images/score_buttons.png";
-    bgImage.src = "../Images/Background.png";
-
-    var buttonX = [192,192];
-    var buttonY = [100,160];
-    var buttonWidth = [96,260,182,160];
-    var buttonHeight = [40,40,40,40];
-
-    var scoreX = [(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3)]
-    var scoreY = [100,150,200,250,300,350,400,450,500,550]
-
-    var initialX = [300, 400, 500]
-    var initialY = [150, 150, 150]
-
-    var framesRate = 30;
-    var timerId = 0;
-
-    timerId = setInterval(update, 1000/framesRate);
-
-    function update() {
+    function updateMenu() {
         myGameArea.clear();
         move();
         draw();
@@ -59,48 +50,48 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
+    let letterIndex = 0;
     let selectedLetter = 0;
     let firstLetter = "_"
     let secondLetter = "_"
     let thirdLetter = "_"
 
+
     function draw() {
-      if (scoreScreen) {
-        context.drawImage(bgImage, 0, backgroundY);
-        context.drawImage(logoImage, 10,-10);
-        context.fillStyle= 'white'
-        context.font="50px Georgia"
-        context.fillText(endScore, scoreX[0], scoreY[0])
-        context.fillText(firstLetter, initialX[0], initialY[0])
-        context.fillText(secondLetter, initialX[1], initialY[1])
-        context.fillText(thirdLetter, initialX[2], initialY[2])
-        switch (selectedLetter) {
-          case 0:
-            firstLetter = genCharArray()[letterIndex]
-            break;
-          case 1:
-            secondLetter = genCharArray()[letterIndex]
-            break;
-          case 2:
-            thirdLetter = genCharArray()[letterIndex]
-            break;
+      context.drawImage(bgImage, 0, backgroundY);
+      context.drawImage(logoImage, 10,-10);
+      switch (menuAction) {
+        case 0:
+          menu = "off"
+          startGame()
+          break;
+        case 1:
+          drawScores()
+          break;
+        case 2:
+          context.fillStyle= 'white'
+          context.font="50px Georgia"
+          context.fillText(finalScore, scoreX[0], scoreY[0])
+          context.fillText(firstLetter, initialX[0], initialY[0])
+          context.fillText(secondLetter, initialX[1], initialY[1])
+          context.fillText(thirdLetter, initialX[2], initialY[2])
+          switch (selectedLetter) {
+            case 0:
+              firstLetter = genCharArray()[letterIndex]
+              break;
+            case 1:
+              secondLetter = genCharArray()[letterIndex]
+              break;
+            case 2:
+              thirdLetter = genCharArray()[letterIndex]
+              break;
+          }
+          break;
+        default:
+          context.drawImage(playImage, buttonX[0], buttonY[0]);
+          context.drawImage(highScoreImage, buttonX[1], buttonY[1]);
         }
       }
-      else {
-        switch (menuAction) {
-          case 1:
-            context.drawImage(bgImage, 0, backgroundY);
-            context.drawImage(logoImage, 10,-10);
-            drawScores()
-            break;
-          default:
-            context.drawImage(bgImage, 0, backgroundY);
-            context.drawImage(logoImage, 10,-10);
-            context.drawImage(playImage, buttonX[0], buttonY[0]);
-            context.drawImage(highScoreImage, buttonX[1], buttonY[1]);
-        }
-      }
-    }
 
     function drawScores(){
       let i = 0;
@@ -112,12 +103,14 @@ document.addEventListener("DOMContentLoaded", function () {
       })
     }
 
-
     var mouseX;
     var mouseY;
     let selection;
 
-    canvas.addEventListener("mousemove", checkPos);
+    function setMenuListeners(){
+      canvas.addEventListener("mousemove", checkPos);
+      canvas.addEventListener("mouseup", checkClick);
+    }
 
     function checkPos(mouseEvent){
         mouseX = mouseEvent.pageX - this.offsetLeft;
@@ -132,20 +125,12 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-
-
-    let menuAction
-    var fadeId = 0;
-
-    canvas.addEventListener("mouseup", checkClick);
-
     function checkClick(mouseEvent){
         for(i = 0; i < buttonX.length; i++){
             if(mouseX > buttonX[i] && mouseX < buttonX[i] + buttonWidth[i]){
                 if(mouseY > buttonY[i] && mouseY < buttonY[i] + buttonHeight[i]){
+                  startFadeOut()
                   menuAction = selection
-                  clearInterval(timerId);
-                  fadeId = setInterval(fadeOut, 1000/framesRate);
                   canvas.removeEventListener("mousemove", checkPos);
                   canvas.removeEventListener("mouseup", checkClick);
                 }
@@ -153,9 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     }
 
-    let letterIndex = 0;
-
-    if(scoreScreen){
+    function setEndGameListeners(){
       document.getElementById('body').addEventListener('keyup', keyUpListener)
     }
 
@@ -194,12 +177,12 @@ document.addEventListener("DOMContentLoaded", function () {
           }
           break;
         case "Enter":
-          scoreScreen = false
-          clearInterval(timerId)
+          startFadeOut()
           removeListeners()
           let name = firstLetter + secondLetter + thirdLetter
-          scores.addScore({initials: name, score: endScore})
-          loadMenu()
+          scores.addScore({initials: name, score: finalScore})
+          setMenuListeners()
+          menuAction = null
           break;
       }
     }
@@ -209,21 +192,26 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     var time = 0.0;
+    var fadeId = 0;
+
+    function startFadeOut(){
+      time = 0.0
+      clearInterval(myGameArea.interval)
+      fadeId = setInterval(fadeOut, 1000/frames);
+    }
 
     function fadeOut(){
-        context.fillStyle = "rgba(0,0,0, 0.2)";
-        context.fillRect (0, 0, width, height);
+      debugger
+        context.fillStyle = "rgba(0,0,0, 0.05)";
+        context.fillRect (0, 0, 800, 700);
         time += 0.1;
-        if(time >= 2){
+        if(time >= 10){
             clearInterval(fadeId);
-            switch (menuAction) {
-              case 0:
-                startGame()
-                break;
-              case 1:
-                timerId = setInterval(update, 1000/framesRate);
-                break;
-            }
+            createGameInterval.call(myGameArea)
         }
     }
-}
+
+document.addEventListener("DOMContentLoaded", function () {
+    setMenuListeners()
+    myGameArea.start();
+})
