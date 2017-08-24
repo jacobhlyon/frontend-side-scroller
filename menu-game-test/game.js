@@ -13,20 +13,20 @@ function startGame() {
   setEventListeners()
   myGamePiece = new component(75, 75, "../Images/red_ship.png", 50, 200, "image");
   myGamePiece.gravity = 100;
-  myScore = new component("50px", "Consolas", "white", 280, 40, "text");
-  myBackground = new component(800, 600, "../Images/space.jpg", 0, 0, "background");
+  myScore = new component("50px", "Timeburner", "white", 280, 40, "text");
+  myBackground = new component(window.innerWidth, window.innerHeight, "../Images/space.jpg", 0, 0, "background");
   myGameArea.play();
 }
 
 function createGameInterval(){
-  this.interval = setInterval(updateGameArea, 30); //speed, lower = faster, framerate, 1000 times/sec
+  this.interval = setInterval(updateGameArea, 7); //speed, lower = faster, framerate, 1000 times/sec
 }
 
 let myGameArea = {
     canvas : document.createElement("canvas"),
     start : function() {
-        this.canvas.width = 800;
-        this.canvas.height = 600;
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         createGameInterval.call(this)
@@ -104,9 +104,9 @@ function component(width, height, color, x, y, type) {
 
     this.crashWith = function(otherobj, firingSide, index) {
         let myleft = this.x;
-        let myright = this.x + (this.width);
-        let mytop = this.y;
-        let mybottom = this.y + (this.height);
+        let myright = this.x + (this.width - 30);
+        let mytop = this.y + 10;
+        let mybottom = this.y + (this.height - 10);
         let otherleft = otherobj.x;
         let otherright = otherobj.x + (otherobj.width);
         let othertop = otherobj.y;
@@ -136,7 +136,6 @@ function updateGameArea() {
     for (i = 0; i < myEnemies.length; i += 1) {
         if (myGamePiece.crashWith(myEnemies[i], 'enemy')) {
           gameOver = 1
-
         }
     }
     for (i = 0; i < enemyBullets.length; i += 1) {
@@ -187,7 +186,7 @@ function updateGameArea() {
         for (i = 0; i < myEnemies.length; i += 1) {
           x = myEnemies[i].x
           y = myEnemies[i].y + ( myEnemies[i].height / 2 )
-          enemyBullets.push(new component(40, 40, "../Images/bullet_blue.png", x, y, "image" ));
+          enemyBullets.push(new component(40, 20, "../Images/bullet_blue.png", x, y, "image" ));
         }
       }
       for (i = 0; i < enemyBullets.length; i += 1) {
@@ -234,13 +233,21 @@ function shootGun() {
 }
 
 function endGameScreen() {
+  scores.sortScoreArray()
+  if (scores.scoreList[9] && scores.scoreList[9].score > updatedScore) {
+      menuAction = 3
+  } else {
+    if (scores.scoreList[9]) {
+      scores.deleteScore(scores.scoreList[9].id)
+    }
+    menuAction = 2
+    }
   startFadeOut()
   removeEventListeners()
   finalScore = updatedScore
   reset()
   setEndGameListeners()
   menu = "on"
-  menuAction = 2
 }
 
 function reset() {
