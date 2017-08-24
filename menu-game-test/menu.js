@@ -23,8 +23,8 @@ document.addEventListener("DOMContentLoaded", function () {
     var bgImage = new Image();
 
     logoImage.src = "../Images/logo.png";
-    playImage.src = "../Images/play.png";
-    highScoreImage.src = "../Images/highscores.png";
+    playImage.src = "../Images/play_buttons.png";
+    highScoreImage.src = "../Images/score_buttons.png";
     bgImage.src = "../Images/Background.png";
 
     var buttonX = [192,192];
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function draw() {
       if (scoreScreen) {
         context.drawImage(bgImage, 0, backgroundY);
-        context.drawImage(logoImage, 200,-10);
+        context.drawImage(logoImage, 10,-10);
         context.fillStyle= 'white'
         context.font="50px Georgia"
         context.fillText(endScore, scoreX[0], scoreY[0])
@@ -90,12 +90,12 @@ document.addEventListener("DOMContentLoaded", function () {
         switch (menuAction) {
           case 1:
             context.drawImage(bgImage, 0, backgroundY);
-            context.drawImage(logoImage, 200,-10);
+            context.drawImage(logoImage, 10,-10);
             drawScores()
             break;
           default:
             context.drawImage(bgImage, 0, backgroundY);
-            context.drawImage(logoImage, 200,-10);
+            context.drawImage(logoImage, 10,-10);
             context.drawImage(playImage, buttonX[0], buttonY[0]);
             context.drawImage(highScoreImage, buttonX[1], buttonY[1]);
         }

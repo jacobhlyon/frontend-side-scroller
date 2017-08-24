@@ -8,12 +8,14 @@ var myBullets = [];
 var myScore;
 var updatedScore = 0;
 var enemiesDestroyed = 0
+var myBackground
 
 function startGame() {
   setEventListeners()
-  myGamePiece = new component(50, 50, "red", 50, 200);
+  myGamePiece = new component(75, 75, "../Images/red_ship.png", 50, 200, "image");
   myGamePiece.gravity = 100;
-  myScore = new component("50px", "Consolas", "black", 280, 40, "text");
+  myScore = new component("50px", "Consolas", "white", 280, 40, "text");
+  myBackground = new component(800, 600, "../Images/space.jpg", 0, 0, "background");
   myGameArea.play();
 }
 
@@ -36,6 +38,10 @@ var myGameArea = {
 
 function component(width, height, color, x, y, type) {
     this.type = type;
+    if (this.type == "image" || this.type == "background") {
+      this.image = new Image()
+      this.image.src = color
+    }
     this.score = 0;
     this.width = width;
     this.height = height;
@@ -51,6 +57,15 @@ function component(width, height, color, x, y, type) {
             ctx.font = this.width + " " + this.height;
             ctx.fillStyle = color;
             ctx.fillText(this.text, this.x, this.y);
+        } else if (this.type == "image" || this.type == "background") {
+            ctx.drawImage(this.image, 
+            this.x, 
+            this.y,
+            this.width, this.height)
+            if (type == "background") {
+                ctx.drawImage(this.image, 
+                this.x + this.width, this.y, this.width, this.height);
+            }
         } else {
             ctx.fillStyle = color;
             ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -60,6 +75,11 @@ function component(width, height, color, x, y, type) {
         this.gravitySpeed = this.gravity;
         this.x += this.speedX;
         this.y += this.speedY + this.gravitySpeed;
+        if (this.type == "background") {
+            if (this.x == -(this.width)) {
+                this.x = 0;
+            }
+        }
         this.hitBottom();
         this.hitTop()
     }
@@ -122,6 +142,9 @@ function updateGameArea() {
         }
     }
     myGameArea.clear();
+    myBackground.update();
+    myBackground.newPos();
+    myBackground.speedX = -1
     myGameArea.frameNo += 1;
     if (myGameArea.frameNo == 1 || everyinterval(300)) {
         x = myGameArea.canvas.width;
@@ -131,8 +154,8 @@ function updateGameArea() {
         minGap = 200;
         maxGap = myGameArea.canvas.height;
         gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
-        myObstacles.push(new component(10, height, "green", x, 0));
-        myObstacles.push(new component(10, x - height - gap, "green", x, height + gap));
+        myObstacles.push(new component(40, height, "../Images/aestroid.png", x, 0, "image"));
+        myObstacles.push(new component(40, x - height - gap, "../Images/aestroid.png", x, height + gap, "image"));
     }
     for (i = 0; i < myObstacles.length; i += 1) {
         myObstacles[i].x += -1;
@@ -141,7 +164,7 @@ function updateGameArea() {
     if (everyinterval(200)) {
           x = myGameArea.canvas.width;
           position = Math.floor(Math.random()*(myGameArea.canvas.height));
-          myEnemies.push(new component(35, 35, "blue", x, position));
+          myEnemies.push(new component(50, 50, "../Images/blue_ship.png", x, position, "image"));
       }
       for (i = 0; i < myEnemies.length; i += 1) {
           myEnemies[i].x += -2;
@@ -151,7 +174,7 @@ function updateGameArea() {
       for (i = 0; i < myEnemies.length; i += 1) {
           x = myEnemies[i].x
           y = myEnemies[i].y + ( myEnemies[i].height / 2 )
-          enemyBullets.push(new component(20, 5, "orange", x, y ));
+          enemyBullets.push(new component(40, 40, "../Images/bullet_blue.png", x, y, "image" ));
         }
     }
     for (i = 0; i < enemyBullets.length; i += 1) {
@@ -190,7 +213,7 @@ function accelerate(n) {
 function shootGun() {
     x = myGamePiece.x
     y = myGamePiece.y + ( myGamePiece.height / 2 )
-    myBullets.push(new component(20, 5, "black", x, y ));
+    myBullets.push(new component(50, 50, "../Images/bullet_red.png", x, y, "image" ));
 }
 
 function sendToMenu() {
