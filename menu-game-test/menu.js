@@ -15,11 +15,6 @@ var highScoreImage = new Image();
 var playImage = new Image();
 var bgImage = new Image();
 
-logoImage.src = "../Images/logo.png";
-playImage.src = "../Images/play.png";
-highScoreImage.src = "../Images/highscores.png";
-bgImage.src = "../Images/Background.png";
-
 var buttonX = [192,192];
 var buttonY = [100,160];
 var buttonWidth = [96,260,182,160];
@@ -27,6 +22,11 @@ var buttonHeight = [40,40,40,40];
 
 var scoreX = [(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3)]
 var scoreY = [100,150,200,250,300,350,400,450,500,550]
+
+logoImage.src = "../Images/logo.png";
+playImage.src = "../Images/play_buttons.png";
+highScoreImage.src = "../Images/score_buttons.png";
+bgImage.src = "../Images/Background.png";
 
 var initialX = [300, 400, 500]
 var initialY = [150, 150, 150]
@@ -59,7 +59,7 @@ var timerId = 0;
 
     function draw() {
       context.drawImage(bgImage, 0, backgroundY);
-      context.drawImage(logoImage, 200,-10);
+      context.drawImage(logoImage, 10,-10);
       switch (menuAction) {
         case 0:
           menu = "off"
