@@ -10,10 +10,11 @@ var updatedScore = 0;
 var enemiesDestroyed = 0
 
 function startGame() {
-    myGamePiece = new component(50, 50, "red", 50, 200);
-    myGamePiece.gravity = 100;
-    myScore = new component("50px", "Consolas", "black", 280, 40, "text");
-    myGameArea.play();
+  setEventListeners()
+  myGamePiece = new component(50, 50, "red", 50, 200);
+  myGamePiece.gravity = 100;
+  myScore = new component("50px", "Consolas", "black", 280, 40, "text");
+  myGameArea.play();
 }
 
 var myGameArea = {
@@ -24,7 +25,7 @@ var myGameArea = {
         this.context = this.canvas.getContext("2d");
         document.body.insertBefore(this.canvas, document.body.childNodes[0]);
         },
-    play : function () {   
+    play : function () {
         this.frameNo = 0;
         this.interval = setInterval(updateGameArea, 7); //speed, lower = faster, framerate, 1000 times/sec
         },
@@ -102,17 +103,17 @@ function updateGameArea() {
     var x, height, gap, minHeight, maxHeight, minGap, maxGap;
     for (i = 0; i < myObstacles.length; i += 1) {
         if (myGamePiece.crashWith(myObstacles[i], 'enemy')) {
-            sendToMenu()
+          return sendToMenu()
         }
     }
     for (i = 0; i < myEnemies.length; i += 1) {
         if (myGamePiece.crashWith(myEnemies[i], 'enemy')) {
-            sendToMenu()
+          return sendToMenu()
         }
     }
     for (i = 0; i < enemyBullets.length; i += 1) {
         if (myGamePiece.crashWith(enemyBullets[i], 'enemy')) {
-            sendToMenu()
+          return sendToMenu()
         }
     }
     for (i = 0; i < myBullets.length; i += 1) {
@@ -193,10 +194,13 @@ function shootGun() {
 }
 
 function sendToMenu() {
-    clearInterval(myGameArea.interval)
-    reset()
-    loadMenu()
+  removeEventListeners()
+  clearInterval(myGameArea.interval)
+  let finalScore = updatedScore
+  reset()
+  loadMenu(true, finalScore)
 }
+
 function reset() {
     myObstacles = [];
     myEnemies = [];
@@ -208,27 +212,31 @@ function reset() {
     myGameArea.frameNo = 0
 }
 
-
-document.getElementById('body').addEventListener('keydown', function(){
+function setKeydownListener(){
   if(event.key === "w" || event.key === "ArrowUp" ) { //up
     accelerate(-2)
   } else if (event.key === "s" || event.key === "ArrowDown") { //down
     accelerate(2)
   }
-})
+}
 
-
-document.getElementById('body').addEventListener('keyup', function(){
+function setKeyupListener() {
   if (event.key === "w" ||
-      event.key === "ArrowUp" ||
-      event.key === "s" ||
-      event.key === "ArrowDown") {
+  event.key === "ArrowUp" ||
+  event.key === "s" ||
+  event.key === "ArrowDown") {
     accelerate(0)
-  }
-})
-
-document.getElementById('body').addEventListener('keyup', function(){
-  if(event.which === 32) { //space
+  } else if(event.which === 32) { //space
     shootGun();
   }
-})
+}
+
+function setEventListeners() {
+  document.getElementById('body').addEventListener('keydown', setKeydownListener)
+  document.getElementById('body').addEventListener('keyup', setKeyupListener)
+}
+
+function removeEventListeners(){
+  document.body.removeEventListener('keydown', setKeydownListener)
+  document.body.removeEventListener('keyup', setKeyupListener)
+}
