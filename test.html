@@ -131,8 +131,7 @@ function updateGameArea() {
     }
     for (i = 0; i < myBullets.length; i += 1) {
       for (j = 0; j < myEnemies.length; j += 1) {
-          if (myEnemies[j].crashWith(myBullets[i], 'friendly', j)) {
-          }
+          myEnemies[j].crashWith(myBullets[i], 'friendly', j)
         }
     }
     myGameArea.clear();
