@@ -6,6 +6,7 @@ class ScoreListAdapter {
   getScores(){
     return fetch(this.baseUrl)
       .then(res => res.json())
+      .catch(error => console.log(error))
   }
 
   createScore(newScore){
@@ -19,18 +20,20 @@ class ScoreListAdapter {
 			headers: {
 				"Content-Type": "application/json"
 			}
-		}).then(res => res.json)
+		}).then(res => res.json())
+    .catch(error => console.log(error))
   }
 
-  deleteNote(scoreId) {
-  const deleteUrl = `${this.baseUrl}/${noteId}`
-  const noteDeleteParams = {
+  deleteScore(scoreId) {
+  const deleteUrl = `${this.baseUrl}/${scoreId}`
+  const scoreDeleteParams = {
     method: 'DELETE',
     headers: {
       'Content-Type':'application/json'
       }
     }
-    return fetch(deleteUrl,noteDeleteParams).then( resp => resp.json() )
+    return fetch(deleteUrl,scoreDeleteParams)
+      .catch(error => console.log(error))
   }
 
 

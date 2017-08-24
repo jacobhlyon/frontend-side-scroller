@@ -13,12 +13,11 @@ class ScoreList {
 
   addScore(newScore) {
     this.adapter.createScore(newScore)
-    .then( (scoreJSON) => this.scoreList.push(new Score(scoreJSON)) )
+    .then( scoreJSON => this.scoreList.push(new Score(scoreJSON)) )
   }
 
   deleteScore(oldScore) {
     this.adapter.deleteScore(oldScore)
-    this.renderAll()
   }
 
   renderAll() {
