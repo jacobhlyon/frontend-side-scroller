@@ -13,7 +13,7 @@ function startGame() {
   setEventListeners()
   myGamePiece = new component(75, 75, "../Images/red_ship.png", 50, 200, "image");
   myGamePiece.gravity = 100;
-  myScore = new component("50px", "Timeburner", "white", 280, 40, "text");
+  myScore = new component("50px", "Timeburner", "white", canvas.width / 2 - this.width / 2, 60, "text");
   myBackground = new component(window.innerWidth, window.innerHeight, "../Images/space.jpg", 0, 0, "background");
   myGameArea.play();
 }
