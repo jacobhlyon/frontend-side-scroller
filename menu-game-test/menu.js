@@ -23,7 +23,7 @@ var buttonHeight = [40,40,40,40];
 
 var scoreWidth = canvas.width/2 + this.width + this.width/3
 
-var scoreX = [scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth]
+var scoreX = [scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,650]
 var scoreY = [200,250,300,350,400,450,500,550,600,650]
 
 logoImage.src = "../Images/logo.png";
@@ -34,9 +34,6 @@ bgImage.src = "../Images/Background.png";
 var initialX = [550, 650, 750]
 var initialY = [300, 300, 300]
 
-var framesRate = 30;
-var timerId = 0;
-
 function updateMenu() {
   myGameArea.clear();
   move();
@@ -44,11 +41,11 @@ function updateMenu() {
 }
 
 var backgroundY = 0;
-var speed = 1;
+var speed = 0.5;
 
 function move(){
   backgroundY -= speed;
-  if(backgroundY == -1 * height){
+  if(backgroundY === (-window.innerHeight)){
       backgroundY = 0;
   }
 }
@@ -61,8 +58,8 @@ let thirdLetter = "_"
 
 
 function draw() {
-context.drawImage(bgImage, 0, backgroundY, window.innerWidth, window.innerHeight + 500);
-context.drawImage(logoImage, window.innerWidth / 2 - logoImage.width / 2, 10);
+context.drawImage(bgImage, 0, backgroundY, window.innerWidth, window.innerHeight * 2);
+context.drawImage(logoImage, 10,-10);
 switch (menuAction) {
   case 0:
     menu = "off"
@@ -76,7 +73,7 @@ switch (menuAction) {
   case 2:
     context.fillStyle= 'white'
     context.font="50px Timeburner"
-    context.fillText(finalScore, scoreX[0], scoreY[0])
+    context.fillText(`Score: ${finalScore}`, scoreX[0], scoreY[0])
     context.fillText(firstLetter, initialX[0], initialY[0])
     context.fillText(secondLetter, initialX[1], initialY[1])
     context.fillText(thirdLetter, initialX[2], initialY[2])
@@ -91,10 +88,12 @@ switch (menuAction) {
         thirdLetter = genCharArray()[letterIndex]
         break;
     }
+    break;
   case 3:
     context.fillStyle= 'white'
     context.font="50px Timeburner"
-    context.fillText(finalScore, scoreX[10], scoreY[0])
+    context.fillText(`Score: ${finalScore}`, scoreX[10], scoreY[0])
+    context.fillText("Press esc for menu", 200, 550)
     break;
   default:
     context.drawImage(playImage, buttonX[0], buttonY[0]);
@@ -240,6 +239,7 @@ function fadeOut(){
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    setMenuListeners()
-    myGameArea.start();
+  music()
+  setMenuListeners()
+  myGameArea.start();
 })

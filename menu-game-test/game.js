@@ -6,10 +6,36 @@ let myBullets = [];
 let myScore;
 let updatedScore = 0;
 let enemiesDestroyed = 0
+let obstaclesDestroyed = 0
 let gameOver = 0
 let myBackground
 
+let enemyBoss;
+let level = 1
+let bossFight = false
+let bossMovement = "up"
+let bossesDestroyed = 0
+let bossHP = 0
+
+function music() {
+  let source;
+  switch (menu) {
+    case "on":
+        source = "Toro_y_Moi_-_Still_Sound_Live__KEXP.mp3"
+      break;
+    case "off":
+      if(bossFight === false){
+        source = "Goto80_-_05_-_Soft_Commando.mp3"
+      } else{
+        source = "Goto80_-_06_-_Monster.mp3"
+      }
+      break;
+  }
+  document.getElementById('audio').innerHTML = `<audio loop="loop" autoplay="autoplay"><source src="../Sounds/${source}" type="audio/mpeg" /></audio>`
+}
+
 function startGame() {
+  music()
   setEventListeners()
   myGamePiece = new component(75, 75, "../Images/red_ship.png", 50, 200, "image");
   myGamePiece.gravity = 100;
@@ -102,7 +128,7 @@ function component(width, height, color, x, y, type) {
       }
     }
 
-    this.crashWith = function(otherobj, firingSide, index) {
+    this.crashWith = function(otherobj, firingSide, index, target) {
         let myleft = this.x;
         let myright = this.x + (this.width - 30);
         let mytop = this.y + 10;
@@ -111,15 +137,10 @@ function component(width, height, color, x, y, type) {
         let otherright = otherobj.x + (otherobj.width);
         let othertop = otherobj.y;
         let otherbottom = otherobj.y + (otherobj.height);
-        let crash = false;
         if ( !((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright))) {
-            if (firingSide === 'enemy') {
-              crash = true;
-            } else if (firingSide === 'friendly') {
-              destroyEnemy(index);
-            }
+            return true
         }
-        return crash;
+        return false;
     }
 }
 
@@ -145,7 +166,16 @@ function updateGameArea() {
     }
     for (i = 0; i < myBullets.length; i += 1) {
       for (j = 0; j < myEnemies.length; j += 1) {
-          myEnemies[j].crashWith(myBullets[i], 'friendly', j)
+          if(myEnemies[j].crashWith(myBullets[i], 'friendly')){
+            destroyEnemy(i, j, "enemy")
+          }
+        }
+    }
+    for (i = 0; i < myBullets.length; i += 1) {
+      for (j = 0; j < myObstacles.length; j += 1) {
+          if(myObstacles[j].crashWith(myBullets[i], 'friendly')){
+            destroyEnemy(i, j, "asteroid")
+          }
         }
     }
 
@@ -157,31 +187,91 @@ function updateGameArea() {
       myBackground.speedX = -1
       myGameArea.frameNo += 1;
 
-      if (myGameArea.frameNo == 1 || everyinterval(300)) {
-
-        x = myGameArea.canvas.width;
-        minHeight = 20; //change to increase size of obstacles
-        maxHeight = 200;
-        height = Math.floor(Math.random()*(maxHeight-minHeight+1)+minHeight);
-        minGap = 200;
-        maxGap = myGameArea.canvas.height;
-        gap = Math.floor(Math.random()*(maxGap-minGap+1)+minGap);
-        myObstacles.push(new component(40, height, "../Images/aestroid.png", x, 0, "image"));
-        myObstacles.push(new component(40, x - height - gap, "../Images/aestroid.png", x, height + gap, "image"));
-    }
-    for (i = 0; i < myObstacles.length; i += 1) {
-        myObstacles[i].x += -1;
-        myObstacles[i].update();
-    }
-    if (everyinterval(200)) {
+      if (bossFight === false){
+        if( everyinterval(Math.floor(50/level)) ) {
           x = myGameArea.canvas.width;
-          position = Math.floor(Math.random()*(myGameArea.canvas.height));
-          myEnemies.push(new component(50, 50, "../Images/blue_ship.png", x, position, "image"));
+          position = Math.floor(Math.random()*(myGameArea.canvas.height - 50));
+          myObstacles.push(new component(30, 30, "../Images/aestroid.png", x, position, "image"))
       }
-      for (i = 0; i < myEnemies.length; i += 1) {
-        myEnemies[i].x += -2;
-        myEnemies[i].update();
+      for (i = 0; i < myObstacles.length; i += 1) {
+          myObstacles[i].x += -1;
+          myObstacles[i].update();
       }
+      if ( everyinterval(Math.floor(200/level)) ) {
+            x = myGameArea.canvas.width;
+            position = Math.floor(Math.random()*(myGameArea.canvas.height - 50));
+            myEnemies.push(new component(60, 60, "../Images/blue_ship.png", x, position, "image"))
+        }
+        for (i = 0; i < myEnemies.length; i += 1) {
+          myEnemies[i].x += -2;
+          myEnemies[i].update();
+        }
+      }
+
+
+      //BOSS FIGHT
+
+      if(updatedScore > (1000 * level)){
+        myEnemies = []
+        myObstacles = []
+        enemyBullets = []
+        bossHP = (20 * level)
+        level +=100
+        bossFight = true
+        music()
+        createBoss()
+      }
+
+      if (bossFight === true) {
+        myBackground.speedX = 0
+        if(enemyBoss.x > 700) {
+          enemyBoss.x += -4;
+          enemyBoss.update();
+        }
+
+        if(enemyBoss.y + 600 === window.innerHeight) {
+          bossMovement = "up"
+        } else if (enemyBoss.y === 0) {
+          bossMovement = "down"
+        }
+
+        if(bossMovement === "up"){
+          enemyBoss.y += -1;
+        } else if (bossMovement = "down"){
+          enemyBoss.y += 1;
+        }
+
+        enemyBoss.update()
+
+        if(everyinterval(150)){
+          x = enemyBoss.x
+          y1 = enemyBoss.y
+          y2 = enemyBoss.y + ( Math.floor(enemyBoss.height * 0.75/3) )
+          y3 = enemyBoss.y + ( Math.floor(enemyBoss.height / 2 ) )
+          y4 = enemyBoss.y + ( Math.floor(enemyBoss.height * 3/4.0) )
+          y5 = enemyBoss.y + enemyBoss.height
+          enemyBullets.push(new component(60, 30, "../Images/bullet_blue.png", x, y1, "image" ));
+          enemyBullets.push(new component(60, 30, "../Images/bullet_blue.png", x, y2, "image" ));
+          enemyBullets.push(new component(60, 30, "../Images/bullet_blue.png", x, y3, "image" ));
+          enemyBullets.push(new component(60, 30, "../Images/bullet_blue.png", x, y4, "image" ));
+          enemyBullets.push(new component(60, 30, "../Images/bullet_blue.png", x, y5, "image" ));
+        }
+
+        for (i = 0; i < myBullets.length; i += 1) {
+          if(enemyBoss.crashWith(myBullets[i], 'friendly', j, "enemy")) {
+            destroyEnemy(i)
+            bossHP--
+            if(bossHP === 0){
+              bossFight = false
+              destroyEnemy(null,null, "boss")
+              break;
+            }
+          }
+        }
+
+      }
+        //
+
       if (everyinterval(200)) {
         for (i = 0; i < myEnemies.length; i += 1) {
           x = myEnemies[i].x
@@ -195,6 +285,9 @@ function updateGameArea() {
       }
       for (i = 0; i < myBullets.length; i += 1) {
         myBullets[i].x += 7;
+        if(myBullets[i].x > window.innerWidth){
+          destroyEnemy(i)
+        }
         myBullets[i].update();
       }
       myScore.text="SCORE: " + updateScore()
@@ -207,13 +300,35 @@ function updateGameArea() {
   }
 }
 
-function destroyEnemy(i) {
-    myEnemies.splice(i, 1)
-    enemiesDestroyed++
+function createBoss() {
+  x = window.innerWidth;
+  position = Math.floor( window.innerHeight /8 );
+  enemyBoss = new component(600, 600, "../Images/blue_boss.png", x, position, "image");
+}
+
+function destroyEnemy(i, j, target) {
+  myBullets.splice(i, 1)
+  switch (target) {
+    case "enemy":
+      myEnemies.splice(j, 1)
+      enemiesDestroyed++
+      break;
+    case "asteroid":
+      myObstacles.splice(j, 1)
+      obstaclesDestroyed++
+      break;
+    case "boss":
+      debugger
+      enemyBoss = null
+      bossesDestroyed++
+      break;
+    default:
+  }
+
 }
 
 function updateScore() {
-    updatedScore = myGameArea.frameNo + (enemiesDestroyed * 1000)
+    updatedScore = myGameArea.frameNo + (enemiesDestroyed * 500) + (obstaclesDestroyed * 100) + (bossesDestroyed * 1000)
     return updatedScore
 }
 
@@ -228,19 +343,20 @@ function accelerate(n) {
 
 function shootGun() {
     x = myGamePiece.x
-    y = myGamePiece.y + ( myGamePiece.height / 2 )
+    y = myGamePiece.y + ( (myGamePiece.height / 2 ) - 27)
     myBullets.push(new component(50, 50, "../Images/bullet_red.png", x, y, "image" ));
 }
 
 function endGameScreen() {
   scores.sortScoreArray()
   if (scores.scoreList[9] && scores.scoreList[9].score > updatedScore) {
-      menuAction = 3
+    setHighScoresListeners()
+    menuAction = 3
   } else {
+    menuAction = 2
     if (scores.scoreList[9]) {
       scores.deleteScore(scores.scoreList[9].id)
     }
-    menuAction = 2
     }
   startFadeOut()
   removeEventListeners()
@@ -248,6 +364,7 @@ function endGameScreen() {
   reset()
   setEndGameListeners()
   menu = "on"
+  music()
 }
 
 function reset() {
@@ -258,6 +375,8 @@ function reset() {
     myScore = 0;
     updatedScore = 0;
     enemiesDestroyed = 0
+    bossFight = false
+    bossEnemy = null
 }
 
 function setKeydownListener(){
