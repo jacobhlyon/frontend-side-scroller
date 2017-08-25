@@ -27,7 +27,7 @@ function music() {
       if(bossFight === false){
         source = "Goto80_-_05_-_Soft_Commando.mp3"
       } else{
-        source = "Goto80_-_06_-_Monster.mp3"
+        source = "Goto80_-_06_-_Monster.wav"
       }
       break;
   }
