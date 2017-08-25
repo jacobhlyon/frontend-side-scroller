@@ -16,15 +16,15 @@ var playImage = new Image();
 var bgImage = new Image();
 
 
-var buttonX = [620, 550];
+var buttonX = [620, 535];
 var buttonY = [200,300];
-var buttonWidth = [96,260,182,160];
-var buttonHeight = [40,40,40,40];
+var buttonWidth = [620,535];
+var buttonHeight = [200,300];
 
 var scoreWidth = canvas.width/2 + this.width + this.width/3
 
 var scoreX = [scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,650]
-var scoreY = [200,250,300,350,400,450,500,550,600,650]
+var scoreY = [200,240,280,320,360,400,440,480,520,560]
 
 logoImage.src = "../Images/logo.png";
 playImage.src = "../Images/play_buttons.png";
@@ -32,7 +32,7 @@ highScoreImage.src = "../Images/score_buttons.png";
 bgImage.src = "../Images/Background.png";
 
 var initialX = [550, 650, 750]
-var initialY = [300, 300, 300]
+var initialY = [500, 500, 500]
 
 function updateMenu() {
   myGameArea.clear();
@@ -59,7 +59,7 @@ let thirdLetter = "_"
 
 function draw() {
 context.drawImage(bgImage, 0, backgroundY, window.innerWidth, window.innerHeight * 2);
-context.drawImage(logoImage, 10,-10);
+context.drawImage(logoImage, window.innerWidth/2 - logoImage.width/2,10);
 switch (menuAction) {
   case 0:
     menu = "off"
@@ -67,13 +67,13 @@ switch (menuAction) {
     break;
   case 1:
     setHighScoresListeners() //put in a location to set once
-    context.fillText("Press esc for menu", window.innerWidth/2 - this.width/2 - this.width/4, 720)
+    context.fillText("Press esc for menu", window.innerWidth/2 - this.width/2, 650)
     drawScores.call(scores)
     break;
   case 2:
     context.fillStyle= 'white'
     context.font="50px Timeburner"
-    context.fillText(`Score: ${finalScore}`, scoreX[0], scoreY[0])
+    context.fillText(`Score: ${finalScore}`, scoreX[3], scoreY[3])
     context.fillText(firstLetter, initialX[0], initialY[0])
     context.fillText(secondLetter, initialX[1], initialY[1])
     context.fillText(thirdLetter, initialX[2], initialY[2])
@@ -92,8 +92,8 @@ switch (menuAction) {
   case 3:
     context.fillStyle= 'white'
     context.font="50px Timeburner"
-    context.fillText(`Score: ${finalScore}`, scoreX[10], scoreY[0])
-    context.fillText("Press esc for menu", 200, 550)
+    context.fillText(`Score: ${finalScore}`, scoreX[3], scoreY[3])
+    context.fillText("Press esc for menu", window.innerWidth/2 - this.width/2 - this.width/4, 650)
     break;
   default:
     context.drawImage(playImage, buttonX[0], buttonY[0]);
@@ -104,7 +104,7 @@ switch (menuAction) {
 function drawScores(){
   let i = 0;
   context.fillStyle= 'white'
-  context.font="50px Timeburner";
+  context.font="30px Timeburner";
   scores.renderAll().forEach(score => {
     context.fillText(score, scoreX[i], scoreY[i])
     i++

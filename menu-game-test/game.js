@@ -211,12 +211,12 @@ function updateGameArea() {
 
       //BOSS FIGHT
 
-      if(updatedScore > (1000 * level)){
+      if(updatedScore > (10000 * level)){
         myEnemies = []
         myObstacles = []
         enemyBullets = []
         bossHP = (20 * level)
-        level +=100
+        level +=1
         bossFight = true
         music()
         createBoss()
@@ -243,7 +243,7 @@ function updateGameArea() {
 
         enemyBoss.update()
 
-        if(everyinterval(150)){
+        if(everyinterval(200)){
           x = enemyBoss.x
           y1 = enemyBoss.y
           y2 = enemyBoss.y + ( Math.floor(enemyBoss.height * 0.75/3) )
@@ -318,7 +318,7 @@ function destroyEnemy(i, j, target) {
       obstaclesDestroyed++
       break;
     case "boss":
-      debugger
+      music()
       enemyBoss = null
       bossesDestroyed++
       break;
@@ -377,6 +377,9 @@ function reset() {
     enemiesDestroyed = 0
     bossFight = false
     bossEnemy = null
+    level = 1
+    obstaclesDestroyed = 0
+    bossesDestroyed = 0
 }
 
 function setKeydownListener(){
