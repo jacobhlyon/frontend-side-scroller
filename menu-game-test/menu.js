@@ -16,21 +16,23 @@ var playImage = new Image();
 var bgImage = new Image();
 
 
-var buttonX = [192,192];
-var buttonY = [100,160];
+var buttonX = [620, 550];
+var buttonY = [200,300];
 var buttonWidth = [96,260,182,160];
 var buttonHeight = [40,40,40,40];
 
-var scoreX = [(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3),(width/3)]
-var scoreY = [100,150,200,250,300,350,400,450,500,550]
+var scoreWidth = canvas.width/2 + this.width + this.width/3
+
+var scoreX = [scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,scoreWidth,650]
+var scoreY = [200,250,300,350,400,450,500,550,600,650]
 
 logoImage.src = "../Images/logo.png";
 playImage.src = "../Images/play_buttons.png";
 highScoreImage.src = "../Images/score_buttons.png";
 bgImage.src = "../Images/Background.png";
 
-var initialX = [300, 400, 500]
-var initialY = [150, 150, 150]
+var initialX = [550, 650, 750]
+var initialY = [300, 300, 300]
 
 function updateMenu() {
   myGameArea.clear();
@@ -65,7 +67,7 @@ switch (menuAction) {
     break;
   case 1:
     setHighScoresListeners() //put in a location to set once
-    context.fillText("Press esc for menu", 200, 550)
+    context.fillText("Press esc for menu", window.innerWidth/2 - this.width/2 - this.width/4, 720)
     drawScores.call(scores)
     break;
   case 2:
@@ -90,7 +92,7 @@ switch (menuAction) {
   case 3:
     context.fillStyle= 'white'
     context.font="50px Timeburner"
-    context.fillText(`Score: ${finalScore}`, scoreX[0], scoreY[0])
+    context.fillText(`Score: ${finalScore}`, scoreX[10], scoreY[0])
     context.fillText("Press esc for menu", 200, 550)
     break;
   default:
