@@ -4,7 +4,7 @@ Space Square Dance is an arcade game themed around cowboys in space. It was made
 
 ## Getting Started
 
-Download all dependencies listed below to begin running app. Alpha version is live to use. Please report any bugs or issues.
+Download all dependencies listed below to begin running app.
 
 * [Demo](https://youtu.be/jOfG1SjMaTA)
 * [Backend Repo](https://github.com/jacobhlyon/backend-side-scroller)
